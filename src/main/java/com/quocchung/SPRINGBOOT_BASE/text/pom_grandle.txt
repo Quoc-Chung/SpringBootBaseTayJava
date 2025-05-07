@@ -1,0 +1,19 @@
+=====================================================================================================
+1. Thêm vào file pom.xml (nếu dùng Maven):
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-devtools</artifactId>
+    <scope>runtime</scope>
+    <optional>true</optional>
+</dependency>
+
+
+2. Thêm vào build.gradle (nếu dùng Gradle):
+developmentOnly("org.springframework.boot:spring-boot-devtools")
+Chú ý: DevTools chỉ hoạt động ở môi trường development, không nên dùng khi deploy lên production.
+
++ Tìm bật hai cái này lên là OK:
+   + Build project automatically
+   + Allow auto-make to start even if developed application is currently running (nếu có dòng này)
+====================================================================================================
+

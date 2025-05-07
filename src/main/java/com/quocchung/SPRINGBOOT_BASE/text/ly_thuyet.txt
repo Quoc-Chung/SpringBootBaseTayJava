@@ -1,0 +1,126 @@
+ mvn clean install -DskipTests
+ mvn clean install
+-----------------------------------------------------------------------
+- Tạo dto :
+     + request:
+            + So khớp với phần body gửi trong tham số của hàm POST.
+
+     + response
+------------------------------------------------------------------------
+- Sửa thì cần truyền vào : ID  + DỮ LIỆU MỚI
+- Sửa thì dùng @PutMapping("/edit/{userId}"), sau do PathVariable
+------------------------------------------------------------------------
+- required = false: Không bắt buộc phải nhập nhưng nó vẫn chạy đúng
+- required = true : Bắt buộc phải có tham số truyền vào.
+
+
+------------------------------------------------------------------------
+- CÁCH SỬ DỤNG SWAGGER ĐỂ TEST API:
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.5.0</version> <!-- Hoặc bản mới nhất -->
+		</dependency>
+
+http://localhost:8080/swagger-ui/index.html
+------------------------------------------------------------------------
+java.util.Date => CHỨA CẢ GIỜ
+     + Đại diện cho một thời điểm cụ thể (bao gồm ngày và giờ, tính theo mili-giây kể từ 01/01/1970 UTC).
+     + Có chứa thông tin giờ (ví dụ 2025-04-23 00:00:00.000).
+
+
+java.time.LocalDate => KHÔNG CHỨA GIỜ CHỈ CHỨA NGÀY
+     + Đại diện cho một ngày trong năm (chỉ có năm-tháng-ngày, không có giờ/phút/giây).
+
+- Cách tạo riêng Anotation:
+
+
+public class PhoneValidator implements ConstraintValidator {
+
+  + Phương thức này được gọi một lần duy nhất khi validator được khởi tạo.
+  + Bạn có thể dùng để lấy dữ liệu từ annotation nếu cần
+  @Override
+  public void initialize(Annotation constraintAnnotation) {
+    ConstraintValidator.super.initialize(constraintAnnotation);
+  }
+
+  + Phương thức quan trọng nhất: quyết định giá trị có hợp lệ không.
+     + o: giá trị của trường được kiểm tra (ví dụ, giá trị của phone là "0981234567")  => CUSTOM LẠI CHUẨN.
+     + context: cho phép bạn tuỳ chỉnh thông báo lỗi, hoặc vô hiệu hóa lỗi mặc định.
+  @Override
+  public boolean isValid(Object o, ConstraintValidatorContext constraintValidatorContext) {
+    return false;
+  }
+}
+-----------------------------------------------------------------------------
+- Tắt chiếm dụng cổng :
+
+netstat -ano | findstr :8080
+- CÁI NÀO ĐANG ĐỂ Ở CHẾ ĐỘ LISTENNING THÌ NGHĨA LA NÓ ĐANG CHẠY.
+                                                                       <PID>
+  TCP    0.0.0.0:8080           0.0.0.0:0              LISTENING       23468
+  TCP    127.0.0.1:57450        127.0.0.1:8080         TIME_WAIT       0
+  TCP    127.0.0.1:57451        127.0.0.1:8080         TIME_WAIT       0
+  TCP    127.0.0.1:57454        127.0.0.1:8080         TIME_WAIT       0
+  TCP    [::]:8080              [::]:0                 LISTENING       23468
+  TCP    [::1]:8080             [::1]:57445            TIME_WAIT       0
+
+taskkill /PID <PID> /F
+taskkill /PID 23468 /F
+------------------------------------------------------------------------------
+
+- Cái Pattern luôn chỉ dùng được để validate String, còn nhwuxng thằng cu còn lại thì
+không thể dùng được.
+
+  + NHƯ NÀY LÀ BỊ LỖI +
+  @Pattern(regexp = "^(ACTIVE|INACTIVE|NONE)$", message = "Status must be ACTIVE, INACTIVE or NONE")
+  private UserStatus status;
+
+
+Ý nghĩa của việc trả về true:
+    Dữ liệu hợp lệ → sẽ không có lỗi validation, tiếp tục xử lý bình thường.
+    Trong form đăng ký, nếu một field như "giới tính" có giá trị là "MALE" và "FEMALE" được chấp
+    nhận, mà người dùng nhập "male" thì .toUpperCase() sẽ thành "MALE" và được chấp nhận → true.
+
+Ý nghĩa của việc trả về false:
+Dữ liệu không hợp lệ → sẽ gây ra lỗi validation, và nếu bạn dùng Spring hoặc Jakarta EE thì hệ thống
+ksẽ trả lại lỗi cho người dùng (thường là HTTP 400 hoặc hiện thông báo lỗi trên UI).
+
+
+====================================================================================================
+POST : HttpStatus.CREATE - 201 - TẠO THÀNH CÔNG
+
+PUT : HttpStatus.ACCEPTED -202 - ĐƯỢC CHẤP NHẬN
+
+DELETE : HTtpStatus.NOCONTENT - KHÔNG TRẢ VỀ GÌ
+
+GET : HtttpStatus.OK - 200 - LẤY THÀNH CÔNG
+
+- CHúng ta có thẻ khởi tạo đối tượng ngay trong một lớp khi có hàm khởi tạo :
+
+public class ResponseStatus {
+       private String code;
+       private String message;
+       private String label;
+
+       public ResponseStatus() {
+       }
+
+       public ResponseStatus(String code, String message, String label) {
+              this.code = code;
+              this.message = message;
+              this.label = label;
+       }
+
+       /*- Khởi tạo đối tượng ngay trong class khi có hàm khởi tạo -*/
+       public static final ResponseStatus SUCCESS_STATUS = new ResponseStatus(
+           SUCCESS_CODE,
+           SUCCESS_MESSAGE,
+           SUCCESS_LABEL
+       );
+}  => CÁCH DÙNG: ResponseStatus.SUCCESS_STATUS.getCode() + " "
+               + ResponseStatus.SUCCESS_STATUS.getMessage() + " "
+               + ResponseStatus.SUCCESS_STATUS.getLabel()
+
+======================================================================================================
+

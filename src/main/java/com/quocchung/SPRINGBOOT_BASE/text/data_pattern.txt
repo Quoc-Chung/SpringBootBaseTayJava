@@ -1,0 +1,30 @@
+[
+  {
+    "firstName": "anh",
+    "lastName": "nguyen",
+    "phone": "0987654321",
+    "email": "anhnguyen@example.com",
+    "dateOfBirth": "01/05/2000",
+    "permissions": ["GET DATA", "DELETE FILE"],
+    "status": "INACTIVE"
+  },
+  {
+    "firstName": "linh",
+    "lastName": "tran",
+    "phone": "0911223344",
+    "email": "linhtran@example.com",
+    "dateOfBirth": "02/08/2002",
+    "permissions": ["EXPORT FILE", "IMPORT FILE", "GET DATA"],
+    "status": "ACTIVE"
+  },
+  {
+    "firstName": "huy",
+    "lastName": "pham",
+    "phone": "0909090909",
+    "email": "huypham@example.com",
+    "dateOfBirth": "01/12/1998",
+    "permissions": ["UPDATE FILE", "GET DATA"],
+    "status": "PENDING"
+  }
+]
+
