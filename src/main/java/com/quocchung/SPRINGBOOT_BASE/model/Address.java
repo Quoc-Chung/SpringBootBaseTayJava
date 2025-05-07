@@ -3,8 +3,7 @@ package com.quocchung.SPRINGBOOT_BASE.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Setter
-@Getter
+@Data
 @Entity
 @Builder
 @AllArgsConstructor

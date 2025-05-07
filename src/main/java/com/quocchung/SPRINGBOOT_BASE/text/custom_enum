@@ -1,0 +1,27 @@
+
+
+    @Gender(anyOf = {MALE, FEMALE, OTHER})
+    private Gender gender;
+
+
+    @NotNull(message = "type must be not null")
+       /* - Chúng ta sẽ so sánh giá trị của String với các giá trị trong enum UserType không -*/
+       /*-  Cách này giống cách trên nhưng tốt hơn vì ta không phải liệt kê quá nhiều enum -*/
+       @Type(name = "type", enumClass = UserType.class)
+       private String type;
+
+
+    @StatusMapperPattern(name = "status", regexp = "ACTIVE|INACTIVE|NONE")
+    private UserStatus status;
+
+
++ TẠO CÁC ANOTATION
+
++ SAU ĐÓ LIÊN KẾT ANOTATION VỚI VALUDATE ĐỂ KIỂM TRA GIÁ TRỊ
+
+
+public class MyValidator implements ConstraintValidator<A, B>
+A là annotation tùy chỉnh bạn tạo (ví dụ @UserT)
+B là kiểu dữ liệu của trường cần kiểm tra, ví dụ: String, Integer, LocalDate, v.v.
+
+====================================================================================================

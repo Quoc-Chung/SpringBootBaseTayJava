@@ -2,12 +2,9 @@ package com.quocchung.SPRINGBOOT_BASE.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.*;
 
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @Entity
@@ -22,6 +19,5 @@ public class Permission extends AbstractEntity<Integer> {
 
   @Column(name = "description")
   private String description;
-
 
 }

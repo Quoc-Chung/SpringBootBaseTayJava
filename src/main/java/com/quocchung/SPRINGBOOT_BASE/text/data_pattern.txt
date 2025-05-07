@@ -28,3 +28,70 @@
   }
 ]
 
+====================================================================================================
+- TEST POST DATA :
+
+{
+  "firstName": "Tay",
+  "lastName": "Java",
+  "email": "someone@email.com",
+  "phone": "0123456789",
+  "dateOfBirth": "06/05/2003",
+  "gender": "other",
+  "username": "tayjava",
+  "password": "password",
+  "type": "user",
+  "status": "active",
+  "addresses": [
+    {
+      "apartmentNumber": "10",
+      "floor": "10",
+      "building": "A",
+      "streetNumber": "10",
+      "street": "Wall street",
+      "city": "Hanoi",
+      "country": "Vietnam",
+      "addressType": 1
+    }
+  ]
+}
+====================================================================================================
+
+{
+  "firstName": "Tay",
+  "lastName": "Java",
+  "email": "someone@email.com",
+  "phone": "0123456789",
+  "dateOfBirth": "06/05/2003",
+  "gender": "other",
+  "username": "tayjava",
+  "password": "password",
+  "type": "user",
+  "status": "active",
+  "addresses": [
+    {
+      "apartmentNumber": "10",
+      "floor": "10",
+      "building": "A",
+      "streetNumber": "10",
+      "street": "Wall street",
+      "city": "Hanoi",
+      "country": "Vietnam",
+      "addressType": 1
+    }
+  ]
+}'
+
+
+
+
+
+
+
+
+
+
+
+
+
+

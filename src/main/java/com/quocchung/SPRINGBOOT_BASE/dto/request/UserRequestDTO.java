@@ -4,7 +4,9 @@ import static com.quocchung.SPRINGBOOT_BASE.utils.enums.Gender.MALE;
 import static com.quocchung.SPRINGBOOT_BASE.utils.enums.Gender.OTHER;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.quocchung.SPRINGBOOT_BASE.utils.anotation.Phone;
+import com.quocchung.SPRINGBOOT_BASE.utils.anotation.GenderAnotation;
+import com.quocchung.SPRINGBOOT_BASE.utils.anotation.UserStatusAnotation;
+import com.quocchung.SPRINGBOOT_BASE.utils.anotation.UserTypeAnotation;
 import com.quocchung.SPRINGBOOT_BASE.utils.enums.Gender;
 import com.quocchung.SPRINGBOOT_BASE.utils.enums.UserStatus;
 import com.quocchung.SPRINGBOOT_BASE.utils.enums.UserType;
@@ -30,7 +32,7 @@ public class UserRequestDTO implements Serializable {
        private String email;
 
 
-       @Phone(message = "phone invalid format")
+
        private String phone;
 
        @NotNull(message = "dateOfBirth must be not null")
@@ -39,7 +41,8 @@ public class UserRequestDTO implements Serializable {
        private Date dateOfBirth;
 
 
-       @GenderSubset(anyOf = {MALE, FEMALE, OTHER})
+       /*- Gender thuộc trong các cái này -*/
+       @GenderAnotation(anyOf = {MALE, FEMALE, OTHER})
        private Gender gender;
 
        @NotNull(message = "username must be not null")
@@ -49,10 +52,12 @@ public class UserRequestDTO implements Serializable {
        private String password;
 
        @NotNull(message = "type must be not null")
-       @EnumValue(name = "type", enumClass = UserType.class)
+       /* - Chúng ta sẽ so sánh giá trị của String với các giá trị trong enum UserType không -*/
+       /*-  Cách này giống cách trên nhưng tốt hơn vì ta không phải liệt kê quá nhiều enum -*/
+       @UserTypeAnotation(name = "type", enumClass = UserType.class)
        private String type;
 
-       @EnumPattern(name = "status", regexp = "ACTIVE|INACTIVE|NONE")
+       @UserStatusAnotation(name = "status", regexp = "ACTIVE|INACTIVE|NONE")
        private UserStatus status;
 
        @NotEmpty(message = "addresses can not empty")

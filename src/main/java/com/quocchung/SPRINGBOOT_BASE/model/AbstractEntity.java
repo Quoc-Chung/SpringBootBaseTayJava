@@ -5,44 +5,38 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import java.io.Serializable;
-import java.sql.Date;
+import java.time.LocalDateTime;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.LastModifiedBy;
-
 
 @Data
 @MappedSuperclass
-public abstract class AbstractEntity<T extends Serializable> implements Serializable   {
+public abstract class AbstractEntity<T extends Serializable> implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")
   T id;
 
-    @CreatedBy
-    @Column(name = "create_by")
-    T createBy;
+  /*
+  @CreatedBy
+  @Column(name = "create_by")
+  T createBy;
 
-    @LastModifiedBy
-    @Column(name = "updated_by")
-    T updatedBy;
+  @LastModifiedBy
+  @Column(name = "updated_by")
+  T updatedBy;
+  */
+  @Column(name = "created_at", updatable = false)
+  @CreationTimestamp
+  private LocalDateTime createdAt;
 
-    @Column(name = "created_at")
-    @CreationTimestamp
-    private Date createdAt;
-
-    @Column(name = "updated_at")
-    @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedAt;
+  @Column(name = "updated_at")
+  @UpdateTimestamp
+  private LocalDateTime updatedAt;
 }
-
 /*
  +  @Temporal dùng khi bạn làm việc với kiểu java.util.Date
                                              java.util.Calendar trong JPA/Hibernate.

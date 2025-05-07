@@ -7,9 +7,9 @@ import org.springframework.web.context.request.WebRequest;
 /*- Những thằng nào mà ném ra ngoại lệ thì nó sẽ nhảy đến cai nay -*/
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-    public ErrorResponse handleValidationException(Exception ex, WebRequest request) {
-
-
-    }
+//
+//    public ErrorResponse handleValidationException(Exception ex, WebRequest request) {
+//
+//
+//    }
 }

@@ -1,0 +1,77 @@
+==========================================================================
+CREATE TABLE tbl_user (
+
+    gender ENUM('MALE', 'FEMALE', 'OTHER') NOT NUL
+
+    status ENUM('ACTIVE', 'INACTIVE', 'NONE') NOT NULL,
+
+    type ENUM('OWNER', 'ADMIN', 'USER','MANAGER','SYSADMIN') NOT NULL,
+
+);
+
+=========================================================================
+- Trong Enum:
+
+public enum Gender {
+  @JsonProperty("male")
+  MALE,
+  @JsonProperty("female")
+  FEMALE,
+  @JsonProperty("other")
+  OTHER;
+}
+public enum UserStatus {
+  @JsonProperty("active")
+  ACTIVE,
+  @JsonProperty("inactive")
+  INACTIVE,
+  @JsonProperty("none")
+  NONE;
+}
+public enum UserType {
+  @JsonProperty("owner")
+  OWNER,
+  @JsonProperty("admin")
+  ADMIN,
+
+  @JsonProperty("manager")
+  MANAGER,
+
+  @JsonProperty("sysadmin")
+  SYSADMIN,
+
+  @JsonProperty("user")
+  USER;
+}
+
+
+- Trong Entity:
+
+        @Enumerated(EnumType.STRING)
+        @Column(name = "gender", columnDefinition = "VARCHAR(10)")
+        private Gender gender;
+
+        @Enumerated(EnumType.STRING)
+        @Column(name = "type", columnDefinition = "ENUM('OWNER','ADMIN','USER','MANAGER','SYSADMIN')")
+        private UserType type;
+
+        @Enumerated(EnumType.STRING)
+        @Column(name = "status", columnDefinition = "ENUM('ACTIVE','INACTIVE','NONE')")
+        private UserStatus status;
+
+
+
+- Trong DTO:
+
+
+
+       /*- Gender thuộc trong các cái này -*/
+       @GenderAnotation(anyOf = {MALE, FEMALE, OTHER})
+       private Gender gender;
+
+       @UserTypeAnotation(name = "type", enumClass = UserType.class)
+       private String type;
+
+       @UserStatusAnotation(name = "status", regexp = "ACTIVE|INACTIVE|NONE")
+       private UserStatus status;
+
