@@ -1,0 +1,134 @@
+Resolved [org.springframework.web.bind.MethodArgumentNotValidException:
+Validation failed for argument [0] in public void com.quocchung.SPRINGBOOT_BASE.controller.UserController.addUser(com.quocchung.SPRINGBOOT_BASE.dto.request.UserRequestDTO):
+[Field error in object 'userRequestDTO' on field 'firstName': rejected value []; codes [NotBlank.userRequestDTO.firstName,NotBlank.firstName,NotBlank.java.lang.String,NotBlank];
+arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [userRequestDTO.firstName,firstName];
+arguments []; default message [firstName]]; default message [firstName must be not blank]] ]
+
++ Tóm tắt lỗi:
+
+MethodArgumentNotValidException: Validation failed for argument [0] in ...
+Field error in object 'userRequestDTO' on field 'firstName': rejected value [];
+default message [firstName must be not blank]
+
+   + Lỗi xảy ra ở tham số đầu tiên
+
++ Nhận diện lỗi:
+    Ý nghĩa của dòng log Resolved [<ExceptionType>: ...]
+
+    Resolved [<Fully Qualified Exception Class>: <Chi tiết lỗi>]
+    Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public void ...]
+
+    MethodArgumentNotValidException
+
+========================================================================================================
+    Khi nhìn log trong terminal:
+
+    Nhìn đoạn Resolved [<exception-name>: ...]
+
+    Copy phần exception đó, bạn có thể tra Google hoặc tra trong JavaDoc để hiểu rõ.
+
+========================================================================================================
+
+Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error:
+Cannot deserialize value of type `com.quocchung.SPRINGB
+
+========================================================================================================
+
+2025-05-08T14:01:46.414+07:00 ERROR 26424 --- [nio-8080-exec-2] o.a.c.c.C.[.[.[/].[dispatcherServlet]:
+Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception
+[Request processing failed:java.util.NoSuchElementException:
+
+No value present] with root cause
+
+- Lỗi trong trường hợp này là : NoSuchElementException
+
+=========================================================================================================
+
+- MethodArgumentTypeMismatchException : Ngoại lệ này xảy ra khi Spring không thể ép kiểu một tham số trong
+URL/query/path sang kiểu mong muốn của controller.
+
+
+@GetMapping("/users/{id}")
+public User getUser(@PathVariable Long id)
+
+/users/abc
+
+=========================================================================================================
+Trong kiến trúc Spring Boot (theo mô hình Controller → Service → Repository),
+ngoại lệ (exception) thường được:
+
+
+. Ném ra (throw) ở tầng Service
+Tầng Service xử lý logic nghiệp vụ.
+
+Khi có lỗi xảy ra (ví dụ không tìm thấy dữ liệu, không hợp lệ...), bạn ném ra exception tại đây.
+
+@Override
+public UserDetailResponse getUser(Long userId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new NoSuchElementException("Không tìm thấy user với id = " + userId));
+
+    return modelMapper.map(user, UserDetailResponse.class);
+}
+
+
+ 2. Bắt và trả về JSON lỗi ở tầng Controller (hoặc GlobalExceptionHandler)
+
+
+ Service: throw new ...Exception(...)
+ Controller hoặc @ControllerAdvice: @ExceptionHandler(...) để trả JSON đẹp và đúng chuẩn HTTP.
+====================================================================================================
+- CUSTOMMISE CÁI THẰNG KHÔNG THUỘC BẤT CỨ CÁI EXCEPTION NÀO:
+
+
+public class ResourceNotFoundException extends  RuntimeException {
+
+  + khởi tạo một cái exception mà không có thông báo lỗi hoặc nguyên nhân.
+  + bạn chỉ muốn ném ra ngoại lệ mà không cần cung câp thông tin chi tiết.
+  + throw new ResourceNotFoundException();
+  public ResourceNotFoundException() {
+  }
+
+
+  + Khởi tạo exception với một thông báo cụ thể.
+  + message: Mô tả lỗi (thường là chuỗi mô tả cụ thể lỗi gì xảy ra).
+  + throw new ResourceNotFoundException("Không tìm thấy tài nguyên có ID 123");
+  public ResourceNotFoundException(String message) {
+    super(message);
+  }
+
+
+  + Kết hợp cả mô tả lỗi và ngoại lệ gốc (dùng để giữ trace lỗi rõ ràng).
+  + message: Thông báo lỗi.
+  + cause: Nguyên nhân gốc (một exception khác gây ra exception này).
+  + try {
+        someCode();
+    } catch (SQLException e) {
+        throw new ResourceNotFoundException("Không tìm thấy tài nguyên trong CSDL", e);
+    }
+  public ResourceNotFoundException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+
+
+  + Tạo exception chỉ với nguyên nhân gốc mà không cần thông báo.
+  + Bạn không quan tâm đến thông báo mô tả, chỉ cần lưu lại nguyên nhân lỗi.
+  + cause: Nguyên nhân gây lỗi.
+  public ResourceNotFoundException(Throwable cause) {
+    super(cause);
+  }
+
+
+
+  + message: Thông báo lỗi.
+  + cause: Nguyên nhân gây lỗi.
+  + enableSuppression: Cho phép hoặc không cho phép suppressed exceptions (Java 7+).
+  + writableStackTrace: Cho phép hoặc không cho phép ghi stack trace.
+  + throw new ResourceNotFoundException("Lỗi nghiêm trọng", cause, false, false);
+
+  public ResourceNotFoundException(String message, Throwable cause, boolean enableSuppression,
+      boolean writableStackTrace) {
+    super(message, cause, enableSuppression, writableStackTrace);
+  }
+}

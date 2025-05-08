@@ -1,0 +1,25 @@
+  Serializable là một interface trong Java, dùng để đánh dấu một class có thể
+  được "tuần tự hóa" (serialize) – tức là chuyển đối tượng thành một chuỗi byte để:
+
+
+  Lưu xuống file,
+
+  Gửi qua mạng,
+
+  Ghi vào database,
+
+  Hoặc tạm lưu trong bộ nhớ (cache)...
+
+
+  Trong nhiều trường hợp, bạn cần lưu trạng thái của một đối tượng để dùng lại
+  sau này (ví dụ: lưu dữ liệu người dùng vào file, gửi sang server...).
+
+  Nhưng một đối tượng trong Java không thể lưu trực tiếp – nó phải được chuyển
+  thành byte → đó là lý do cần Serializable.
+
+
+
+  Class này có thể được chuyển thành byte để lưu trữ hoặc gửi đi.
+
+
+

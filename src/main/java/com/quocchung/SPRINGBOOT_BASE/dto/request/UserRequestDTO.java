@@ -32,7 +32,6 @@ public class UserRequestDTO implements Serializable {
        private String email;
 
 
-
        private String phone;
 
        @NotNull(message = "dateOfBirth must be not null")
@@ -55,7 +54,7 @@ public class UserRequestDTO implements Serializable {
        /* - Chúng ta sẽ so sánh giá trị của String với các giá trị trong enum UserType không -*/
        /*-  Cách này giống cách trên nhưng tốt hơn vì ta không phải liệt kê quá nhiều enum -*/
        @UserTypeAnotation(name = "type", enumClass = UserType.class)
-       private String type;
+       private UserType type;
 
        @UserStatusAnotation(name = "status", regexp = "ACTIVE|INACTIVE|NONE")
        private UserStatus status;

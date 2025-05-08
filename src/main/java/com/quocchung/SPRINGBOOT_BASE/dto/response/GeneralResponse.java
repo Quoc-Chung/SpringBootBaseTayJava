@@ -2,10 +2,14 @@ package com.quocchung.SPRINGBOOT_BASE.dto.response;
 
 import java.io.Serializable;
 import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
-/* - RESPONSE TR VỀ Ở DẠNG BÌNH THƯỜNG -*/
+@Builder
+
+/* - RESPONSE TRA VỀ Ở DẠNG BÌNH THƯỜNG -*/
 public class GeneralResponse<T> implements Serializable {
   private ResponseStatus status;
   private T data;
