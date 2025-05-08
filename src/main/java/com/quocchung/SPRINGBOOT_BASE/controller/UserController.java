@@ -1,4 +1,5 @@
 package com.quocchung.SPRINGBOOT_BASE.controller;
+import com.quocchung.SPRINGBOOT_BASE.config.Translator;
 import com.quocchung.SPRINGBOOT_BASE.dto.request.UserRequestDTO;
 import com.quocchung.SPRINGBOOT_BASE.dto.response.GeneralResponse;
 import com.quocchung.SPRINGBOOT_BASE.dto.response.ResponseData;
@@ -43,8 +44,8 @@ public class UserController
 
   @PostMapping()
   public ResponseData<UserRequestDTO> addUser(@Valid @RequestBody UserRequestDTO userRequestDTO){
-       userService.addUser(userRequestDTO);
-       return new ResponseData<>(HttpStatus.CREATED.value(), "thanh cong roi nha", userRequestDTO);
+       //userService.addUser(userRequestDTO);
+       return new ResponseData<>(HttpStatus.CREATED.value(), Translator.toLocale("user.add.success"), userRequestDTO);
   }
 
 

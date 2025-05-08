@@ -1,0 +1,226 @@
+public class LocalResolver extends AcceptHeaderLocaleResolver implements WebMvcConfigurer {
+
+  @Override
+  public Locale resolveLocale(HttpServletRequest request) {
+    String language_header = request.getHeader("Accept-Language");
+
+    return StringUtils.hasLength(language_header) ? Locale.lookup(Locale.LanguageRange.parse(language_header),
+        List.of(new Locale("en"), new Locale("fr"), new Locale("vi"))
+    ) : Locale.getDefault();
+  }
+
+  @Bean
+  public ResourceBundleMessageSource messageSource() {
+    ResourceBundleMessageSource rs = new ResourceBundleMessageSource();
+    rs.setBasename("messages");
+    rs.setDefaultEncoding("UTF-8");
+    rs.setUseCodeAsDefaultMessage(true);
+    rs.setCacheSeconds(3600);
+    return rs;
+  }
+
+}
+====================================================================================================
+@Component
+public class Translator {
+   private static ResourceBundleMessageSource messageSource;
+
+   @Autowired
+  public Translator(ResourceBundleMessageSource messageSource) {
+    Translator.messageSource = messageSource;
+  }
+
+  public static String toLocale(String msgCode){
+     Locale locale = LocaleContextHolder.getLocale();
+     return  messageSource.getMessage(msgCode,null,locale);
+
+
+  }
+}
+====================================================================================================
+messages.properties
+user.add.success=User added successfully
+user.upd.success=User updated successfully
+user.change.success=User's status changed successfully
+user.del.success=User deleted successfully
+user.not.found=User not found
+
+
+messages_fr.properties
+user.add.success=Utilisateur ajouté avec succès
+user.upd.success=Utilisateur mis à jour avec succès
+user.change.success=Le statut de l'utilisateur a été modifié avec succès
+user.del.success=Utilisateur supprimé avec succès
+user.not.found=Utilisateur introuvable
+
+messages_vi.properties
+user.add.success=Thêm mới thành công
+user.upd.success=Cập nhật thành công
+user.change.success=Sửa đổi thành công
+user.del.success=Xóa thành công
+user.not.found= Không tìm thấy
+
+
+  @PostMapping()
+  public ResponseData<UserRequestDTO> addUser(@Valid @RequestBody UserRequestDTO userRequestDTO){
+       //userService.addUser(userRequestDTO);
+       return new ResponseData<>(HttpStatus.CREATED.value(), Translator.toLocale("user.add.success"), userRequestDTO);
+  }
+========================================================================================================================
++ GỬI THEO API HEADER :
+accept	*/*	                                     Chấp nhận tất cả các loại định dạng phản hồi (*/* = mọi loại MIME type).
+Content-Type	application/json;charset=UTF-8	   Dữ liệu gửi lên là JSON và sử dụng bảng mã UTF-8.
+Accept-Language	fr-FR
+
+- Xử lí đa ngôn ngữ trong (internationalization - i18n) trong Spring Boot,  cụ thể:
+
+   + Một ứng dụng phục vụ người dùng quốc tế cần hiển thị thông báo (message), lỗi , label ,... theo ngôn ngữ người dùng
+   mong muốn.
+
+   + Để làm được điều này, backend phải nhận biết được "local" (ngôn ngữ + vùng) người dùng gửi lên,  rồi dựa vào đó
+   mà trả về đúng nội dung ứng với đúng ngôn ngữ mà họ mong muốn.
+
+   +  Loại ngôn ngữ người dùng được gửi lên từ frontend thông qua HTTP header Accept-Language.
+
+   fetch("http://localhost:8080/api/users", {
+     method: "POST",
+     headers: {
+       "Content-Type": "application/json",
+       "Accept-Language": "fr-FR",  👈 Ngôn ngữ mong muốn
+     },
+     body: JSON.stringify(userData)
+   });
+
+   + Giá trị Accept-Language(Danh sách mã ngôn ngữ)  có thể là:
+
+        Tiếng Anh 🇬🇧	en hoặc en-US (Mỹ), en-GB (Anh)
+        Tiếng Pháp 🇫🇷	fr hoặc fr-FR
+        Tiếng Việt 🇻🇳	vi
+        Tiếng Trung (Phồn thể) 🇹🇼	zh-TW
+        Tiếng Trung (Giản thể) 🇨🇳	zh-CN
+        Tiếng Hàn 🇰🇷	ko hoặc ko-KR
+        Tiếng Nhật 🇯🇵	ja hoặc ja-JP
+        Tiếng Đức 🇩🇪	de hoặc de-DE
+        Tiếng Tây Ban Nha 🇪🇸	es hoặc es-ES
+        Tiếng Ý 🇮🇹	it hoặc it-IT
+        Tiếng Nga 🇷🇺	ru hoặc ru-RU
+        Tiếng Bồ Đào Nha 🇵🇹	pt hoặc pt-PT (Bồ Đào Nha), pt-BR (Brazil)
+        Tiếng Ả Rập 🇸🇦	ar hoặc ar-SA
+        Tiếng Úc (English - Australia) 🇦🇺	en-AU
+
+   + Để backend hỗ trợ nhiều ngôn ngữ như vậy thì làm như nào :
+        + Thêm các file messages_xx.properties (xx là mã ngôn ngữ).
+
+        messages_zh.properties   // Tiếng Trung
+        messages_ko.properties   // Tiếng Hàn
+        messages_ja.properties   // Tiếng Nhật
+        messages_ar.properties   // Tiếng Ả Rập
+
+   + Thêm vào danh sách ngôn ngữ hỗ trợ trong LocalResolver:
+        return StringUtils.hasLength(language_header) ? Locale.lookup(
+            Locale.LanguageRange.parse(language_header),
+            List.of(new Locale("en"), new Locale("fr"), new Locale("vi"), new Locale("zh"),
+                    new Locale("ko"), new Locale("ja"), new Locale("ar"))
+        ) : Locale.getDefault();
+
+
+   + Frontend gửi header Accept-Language phù hợp:
+       Ví dụ gửi request với tiếng Nhật:
+             Accept-Language: ja-JP
+====================================================================================================
+- Vì sao cần phải xử lí đa ngôn ngữ trong backend:
+   + Một ứng dụng phục vụ người dùng quốc tế cần hiển thị thông báo (messages), lỗi, label theo ngôn
+   ngữ mà người dùng mong muốn.
+   + Để làm được điều này , backend phải nhận biết được "locale" (ngôn ngữ + vùng) người dùng gửi lên,
+   rồi dựa vào đó mà trả đúng nội dung (Nội dung sẽ được cấu hinh bên trong messages.properties tương ứng).
+
+
+- Bước 1: Gửi Accept-Language từ client
+   Accept-Language: fr-FR
+
+- Bước 2: Cấu hình LocaleResolver để đọc header:
+
+public class LocalResolver extends AcceptHeaderLocaleResolver implements WebMvcConfigurer {
+  @Override
+  public Locale resolveLocale(HttpServletRequest request) {
+    String language_header = request.getHeader("Accept-Language");
+
+    return StringUtils.hasLength(language_header) ?
+      Locale.lookup(Locale.LanguageRange.parse(language_header),
+        List.of(new Locale("en"), new Locale("fr"), new Locale("vi")))
+      : Locale.getDefault();
+  }
+
+
++ Nếu header có Accept-Language, thì parse và chọn locale phù hợp trong danh sách hỗ trợ (en, fr, vi).
+
++ Nếu không có, dùng Locale.getDefault().
+
+
+
+- Bước 3: Cấu hình messageSource để load file thông báo
+  +
+@Bean
+public ResourceBundleMessageSource messageSource() {
+  ResourceBundleMessageSource rs = new ResourceBundleMessageSource();
+  rs.setBasename("messages"); // => messages.properties
+  rs.setDefaultEncoding("UTF-8");
+  rs.setUseCodeAsDefaultMessage(true);
+  rs.setCacheSeconds(3600);
+  return rs;
+}
+
+
++ messages.properties (mặc định - English)
+
++ messages_fr.properties (French)
+
++ messages_vi.properties (Vietnamese)
+
+
+- Bước 4: Dùng Translator để lấy message theo locale hiện tại
+
+@Component
+public class Translator {
+   private static ResourceBundleMessageSource messageSource;
+
+   @Autowired
+   public Translator(ResourceBundleMessageSource messageSource) {
+     Translator.messageSource = messageSource;
+   }
+
+   + LocaleContextHolder.getLocale() được Spring set sẵn sau khi LocaleResolver xử lý request.
+
+   public static String toLocale(String msgCode){
+     Locale locale = LocaleContextHolder.getLocale(); // lấy locale hiện tại
+     return messageSource.getMessage(msgCode, null, locale); // trả về message đúng ngôn ngữ
+   }
+}
+
+- Bước 5: Gọi trong controller
+
+  @PostMapping()
+  public ResponseData<UserRequestDTO> addUser(@Valid @RequestBody UserRequestDTO userRequestDTO){
+     return new ResponseData<>(HttpStatus.CREATED.value(), Translator.toLocale("user.add.success"), userRequestDTO);
+  }
+
+0. Translator.toLocale("user.add.success")
+1. Locale locale = LocaleContextHolder.getLocale();
+    + Khi người dùng gửi request lên backend (kèm header Accept-Language), Spring sẽ dùng
+    LocaleResolver (như bạn đã cấu hình trong LocalResolver) để xác định locale.
+    + Sau đó, Spring lưu locale này vào trong một thread-local (nơi lưu trữ tạm riêng biệt cho từng luồng).
+
+2. messageSource.getMessage(msgCode, null, locale);
+    + Kiểm tra locale đang là gì (VD: vi)
+
+    + Load file messages_vi.properties
+
+    + Tìm dòng user.add.success=Thêm mới thành công
+
+    + Trả lại chuỗi tiếng Việt tương ứng
+
+3.
+
+
+======================================================================================================
+
