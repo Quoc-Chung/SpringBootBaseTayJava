@@ -1,15 +1,11 @@
 package com.quocchung.SPRINGBOOT_BASE.model;
 
 
-import com.quocchung.SPRINGBOOT_BASE.utils.anotation.UserStatusAnotation;
-import com.quocchung.SPRINGBOOT_BASE.utils.anotation.UserTypeAnotation;
 import com.quocchung.SPRINGBOOT_BASE.utils.enums.Gender;
 import com.quocchung.SPRINGBOOT_BASE.utils.enums.UserStatus;
 import com.quocchung.SPRINGBOOT_BASE.utils.enums.UserType;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 import java.util.*;
 
 @Data
@@ -29,8 +25,6 @@ public class User extends AbstractEntity<Long> {
   @Column(name = "date_of_birth")
   @Temporal(TemporalType.DATE)
   private Date dateOfBirth;
-
-
 
 
 

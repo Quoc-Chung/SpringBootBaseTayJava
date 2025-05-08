@@ -1,5 +1,8 @@
 package com.quocchung.SPRINGBOOT_BASE.dto.response;
 
+import lombok.Data;
+
+@Data
 public class ResponseStatus {
   public static String SUCCESS_CODE = "200";
   public static String PERMISSION_DENIED_CODE = "403";

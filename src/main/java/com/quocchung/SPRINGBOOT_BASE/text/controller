@@ -1,0 +1,8 @@
+
+ - Khi minh muon sua doi chi mot phan cua du lieu dùng PATH:
+   * Cập nhật một phần dữ liệu (partial update)
+   * @param id chỗ cần update
+   * @param updates phần dữ liệu mới cần update
+   * @return trạng thái update dữ liệu một phần có thành công không
+
+

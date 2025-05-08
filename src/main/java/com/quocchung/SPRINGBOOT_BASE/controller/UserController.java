@@ -1,9 +1,15 @@
 package com.quocchung.SPRINGBOOT_BASE.controller;
 import com.quocchung.SPRINGBOOT_BASE.dto.request.UserRequestDTO;
-import com.quocchung.SPRINGBOOT_BASE.dto.response.ResponseSuccess;
+import com.quocchung.SPRINGBOOT_BASE.dto.response.GeneralResponse;
+import com.quocchung.SPRINGBOOT_BASE.dto.response.ResponseData;
+import com.quocchung.SPRINGBOOT_BASE.dto.response.ResponseFactory;
+import com.quocchung.SPRINGBOOT_BASE.dto.response.UserDetailResponse;
+import com.quocchung.SPRINGBOOT_BASE.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,47 +20,43 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/user")
+@RequiredArgsConstructor
 public class UserController
 {
 
+  private final UserService userService;
+
+  @GetMapping("/{id}")
+  public ResponseEntity<?> getUser(@PathVariable Long id){
+    return  ResponseFactory.success(userService.getUser(id));
+  }
 
   @GetMapping()
-  @ResponseStatus(HttpStatus.OK)
-  public String getUser(){
-    return "success";
+  public ResponseEntity<GeneralResponse<List<UserDetailResponse>>> getUser(){
+    return ResponseFactory.success(userService.getAllUsers());
+
   }
 
-  @PostMapping("/")
-  public String addUser(@Valid @RequestBody UserRequestDTO userRequestDTO){
-     return "success";
+  @PostMapping()
+  public ResponseData<UserRequestDTO> addUser(@Valid @RequestBody UserRequestDTO userRequestDTO){
+       userService.addUser(userRequestDTO);
+       return new ResponseData<>(HttpStatus.CREATED.value(), "thanh cong roi nha", userRequestDTO);
   }
-
 
 
   @PutMapping("/users/{userId}")
-  public ResponseSuccess updateUser(@Min(1) @PathVariable int userId, @RequestBody UserRequestDTO user) {
-    return new ResponseSuccess(HttpStatus.ACCEPTED,"User updated success");
+  public void updateUser(@Min(1) @PathVariable Long userId, @RequestBody UserRequestDTO user) {
+     userService.UpdateUser(userId, user);
   }
 
-
-  /**
-   * Cập nhật một phần dữ liệu (partial update)
-   * @param id chỗ cần update
-   * @param updates phần dữ liệu mới cần update
-   * @return trạng thái update dữ liệu một phần có thành công không
-   */
   @PatchMapping("/users/{id}")
   public ResponseEntity<String> updateUserPartial(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
     return ResponseEntity.ok("Đã cập nhật user có ID: " + id);
   }
-
-
-
 
   @DeleteMapping("users/{userId}")
   public String deleteUser(@PathVariable int userId) {

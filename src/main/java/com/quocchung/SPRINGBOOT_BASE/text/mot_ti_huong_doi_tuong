@@ -1,0 +1,72 @@
+public class ApiError {
+    protected int status;
+    protected String message;
+
+    public ApiError(int status, String message) {
+        this.status = status;
+        this.message = message;
+    }
+}
+
+
++ Gọi constructor của lớp cha.
+
++ Đảm bảo lớp cha được khởi tạo đúng trước khi lớp con thực thi.
+
++	Khi lớp cha có constructor có tham số hoặc bạn cần truyền giá trị lên lớp cha.
+
+
+class LớpCha {
+    + thuộc tính và phương thức
+}
+
+class LớpCon extends LớpCha {
+    + kế thừa mọi thứ từ LớpCha
+    + có thể thêm thuộc tính hoặc ghi đè phương thức
+}
+====================================================================================================
+
+- super có hai mục đích chính:
+    + gọi contructor của lớp cha.
+
+    + gọi phương thức hoặc biến của lớp cha.
+
+    + Khi bạn tạo một lớp con, Java bắt buộc phải gọi constructor của lớp cha trước, vì lớp cha cần được khởi tạo trước.
+
+    + super(tham_số);
+
+    + Nếu bạn KHÔNG viết super(...) thì Java ngầm gọi super() (constructor không có tham số).
+
+
+
+class Cha {
+    Cha(String name) {
+        System.out.println("Xin chào, " + name);
+    }
+}
+
+class Con extends Cha {
+    Con() {
+        super("Nam"); // gọi constructor lớp Cha có tham số
+        System.out.println("Đây là constructor của Con");
+    }
+}
+
+
+Xin chào, Nam
+Đây là constructor của Con
+
+
+
+class Cha {
+    Cha(String name) {
+        System.out.println("Xin chào, " + name);
+    }
+}
+
+class Con extends Cha {
+    Con() {
+        // super();  <-- Java sẽ ngầm gọi dòng này
+        System.out.println("Đây là constructor của Con");
+    }
+}

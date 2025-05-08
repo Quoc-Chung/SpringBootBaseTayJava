@@ -14,7 +14,7 @@ import java.lang.annotation.*;
 
 
 */
-@Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
+@Target({ElementType.FIELD, METHOD, PARAMETER, ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Constraint(validatedBy = UserTypeValidator.class)
@@ -22,9 +22,8 @@ public @interface UserTypeAnotation {
   String name();
   Class<? extends Enum<?>> enumClass();
 
-
-
-  String message() default "{name} must be any of enum {enumClass}";
+  String message() default "{name} must be a valid enum of {enumClass}";
   Class<?>[] groups() default {};
   Class<? extends Payload>[] payload() default {};
 }
+
