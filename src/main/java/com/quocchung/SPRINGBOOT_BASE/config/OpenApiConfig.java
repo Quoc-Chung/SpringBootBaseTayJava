@@ -2,7 +2,6 @@ package com.quocchung.SPRINGBOOT_BASE.config;
 
 
 
-
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
@@ -18,10 +17,10 @@ import java.util.List;
 public class OpenApiConfig {
 
   @Bean
-  public OpenAPI customOpenAPI(@Value("${open.api.title}") String title,
-                               @Value("${open.api.version}") String version,
-                               @Value("${open.api.description}") String description,
-                               @Value("${open.api.serverUrl}") String serverUrl) {
+  public OpenAPI customOpenAPI(@Value("${openapi.service.title}") String title,
+                               @Value("${openapi.service.version}") String version,
+                               @Value("${openapi.service.description}") String description,
+                               @Value("${openapi.service.serverUrl}") String serverUrl) {
 
     return new OpenAPI()
         .info(new Info()
@@ -51,6 +50,3 @@ public class OpenApiConfig {
   }
 
 }
-
-
-

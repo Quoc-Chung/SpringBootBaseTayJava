@@ -182,3 +182,41 @@ Sau khi cấu hình như trên, Swagger UI sẽ có các tab chọn nhóm API ri
 
 🔵 Order
 
+====================================================================================================
+@Configuration là một lớp cấu hình (Configuration Class) trong Spring, tức là Spring se quét và thực thi
+các @Bean trong lớp này khi ứng dụng khởi động.
+@Profile("!prod") : Spring chỉ load lớp này trong môi trường active profile khác prod..
+
+Điều này có nghĩa:
+
+  + Nếu bạn đang chạy dev hoặc test ⇒ lớp này được load.
+  + Nếu đang chạy prod ⇒ lớp này bị bỏ qua.
+
+- Không muốn bật Swagger hoặc OpenAPI khi chạy bản production để tránh lộ thông tin API.
+
+
+@Bean
+public GroupedOpenApi publicApi(@Value("${openapi.service.api-docs}") String apiDocs) {
+    return GroupedOpenApi.builder()
+            .group(apiDocs)
+            .packagesToScan("vn.tayjava.controller")
+            .build();
+}
+- Tạo một bean kiểu GroupedOpenApi — dùng để tạo một nhóm tài liệu API trong Swagger UI.
+- String apiDocs : Đây sẽ là tên endpoint của tài liệu OpenAPI
+
+
+@Bean
+public OpenAPI openAPI(
+        @Value("${openapi.service.title}") String title,
+        @Value("${openapi.service.version}") String version,
+        @Value("${openapi.service.server}") String serverUrl) {
+    return new OpenAPI()
+            .servers(List.of(new Server().url(serverUrl)))
+            .info(new Info().title(title)
+                    .description("API documents")
+                    .version(version)
+                    .license(new License().name("Apache 2.0").url("https://springdoc.org")));
+}
+
+- Cấu hình chi tiết các cái tổng quan thông tin về tài liệu OpenAPI.

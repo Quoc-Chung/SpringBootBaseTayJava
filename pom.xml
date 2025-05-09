@@ -101,9 +101,56 @@
 
   </dependencies>
 
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<spring.profiles.active>dev</spring.profiles.active>
+			</properties>
+		</profile>
+		<profile>
+			<id>test</id>
+			<properties>
+				<spring.profiles.active>test</spring.profiles.active>
+			</properties>
+		</profile>
+		<profile>
+			<id>prod</id>
+			<properties>
+				<spring.profiles.active>prod</spring.profiles.active>
+			</properties>
+		</profile>
+	</profiles>
 
 
 	<build>
+
+		<resources>
+			<!-- Lọc biến trong các file yml, xml -->
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<includes>
+					<include>**/*.yml</include>
+					<include>**/*.yaml</include>
+					<include>**/*.xml</include>
+				</includes>
+			</resource>
+
+			<!-- Không lọc file .properties (tránh lỗi encoding) -->
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+		</resources>
+
+
 		<plugins>
 			<!-- Plugin xử lý annotation Lombok -->
 			<plugin>
@@ -130,5 +177,6 @@
 			</plugin>
 		</plugins>
 	</build>
+
 
 </project>

@@ -1,0 +1,7 @@
+- Tốc độ load file của yml nhanh hơn
+
+- Chúng ta nên cấu hình database : yml -> Load nhanh
+                        key, message,  -> Properties
+
+
+mvn clean package -P dev

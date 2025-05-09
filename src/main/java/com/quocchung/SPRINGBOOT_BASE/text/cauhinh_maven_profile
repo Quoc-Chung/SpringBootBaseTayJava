@@ -1,0 +1,282 @@
+- Dùng cho Lead_Team:
+
+  + dev
+  + test
+  + product
+
+- Chúng ta sẽ chuẩn bị một project mới, sau đó thì ở bên dưới phần <dependencies>
+
++ Mỗi một cái profile sẽ tương ứng với một cái môi trường mà minh phải thực hiện
+   <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <spring.profiles.active>test</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+            </properties>
+        </profile>
+    </profiles>
+
+
+
+    + Trong file pom:
+
+
+
+    + application-dev.yml:
+    spring:
+      config:
+        activate:
+          on-profile: dev
+
+    springdoc:
+      api-docs:
+        enabled: true
+      swagger-ui:
+        enabled: true
+    openapi:
+      service:
+        api-docs: api-service
+        server: http://localhost:${server.port}
+        title: API Document
+        version: 1.0.0
+
+    + application-prod.yml:
+    spring:
+      config:
+        activate:
+          on-profile: prod
+
+    springdoc:
+      api-docs:
+        enabled: true
+      swagger-ui:
+        enabled: true
+    openapi:
+      service:
+        api-docs: api-service
+        server: http://api-service.local
+        title: API Document
+        version: 1.0.0
+
+    + application-test.yml:
+    spring:
+      config:
+        activate:
+          on-profile: test
+
+    springdoc:
+      api-docs:
+        enabled: true
+      swagger-ui:
+        enabled: true
+    openapi:
+      service:
+        api-docs: api-service
+        server: http://test.api-service.local
+        title: API Document
+        version: 1.0.0
+
+    + application.properties
+
+
+    + application.yml
+
+    server:
+      port: 80
+    spring:
+      application:
+        name: tay-java-app
+      profiles:
+        active: @spring.profiles.active@
+
+    # Health check
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: '*'
+      endpoint:
+        health:
+          probes:
+            enabled: true
+      health: # config for EKS
+        livenessState:
+          enabled: true
+        readinessState:
+          enabled: true
+      prometheus:
+        metrics:
+          export:
+            step: 5s
+            enabled: true
+
+
+
+
+===================================================================================================================================
+- Cấu hình quản lí môi trường trong ứng dụng Spring Boot sử dụng Maven.
+
+- Đây là một kĩ thuật chuẩn và rất quan trọng trong triển khai phần mềm thực tế.
+
+- Nó cho  phép ứng dụng chạy trên nhiều môi trường khác nhau , ví dụ như dev, test, prod ) mà không cần phải
+sửa lại code. Mỗi môi trường sẽ có cấu hình riêng biệt, ví dụ như database , post, URL, các tính năng bật, tắt,..
+
+<profiles>
+    <profile>
+        <id>dev</id>
+        <activation>
+            <activeByDefault>true</activeByDefault> <!-- Profile mặc định nếu không chỉ định -->
+        </activation>
+        <properties>
+            <spring.profiles.active>dev</spring.profiles.active>
+        </properties>
+    </profile>
+    ...
+</profiles>
+
++ Xác định danh sách các môi trường ứng dụng sẽ hỗ trợ (dev, test, prod).
+
++ Khi Maven build, nó sẽ chọn đúng profile thông qua:
+      -P (ví dụ: mvn clean install -Pprod)
+
+      + Mặc định là dev chạy.
+
++ Maven sẽ gán giá trị @spring.profiles.active@ trong application.yml thành dev, test hoặc prod.
+     spring:
+       profiles:
+         active: @spring.profiles.active@ # Tự động gán bởi Maven từ profile
+
+- Đây là cách câu hình cầu nối giữa maven và Spring boot.
+- Khi maven build, phần @spring.profiles.active@ sẽ được thay thế bằng dev, test, hoặc prod tương ứng.
+
+Bạn tạo các file tương ứng với mỗi môi trường:
+
+
++ application-dev.yml	Phát triển (dev)	Port, Swagger, DB dev
++ application-test.yml	Kiểm thử (test)	URL giả lập test
++ application-prod.yml	Sản xuất (prod)	URL thật, bật bảo mật, tắt debug
+
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+openapi:
+  service:
+    api-docs: api-service
+    server: http://localhost:${server.port}
+    title: API Document
+    version: 1.0.0
+
+
+
+- Cách cấu hình và build trên môi trường :
+
++ Dùng mặc định là môi trường dev:
+mvn clean package
+
+
++ Build theo môi trường cụ thể:
+mvn clean package -P dev
+
+
++ Maven sẽ chọn profile dev và gán vào spring.profiles.active=prod -> Ứng dụng load application-prod.yml.
+=============================================================================================================
+
++ Chỉ định một môi trường chạy :
+     + mvn clean package -P test
+
+     + Nó báo : The follow 1 profile is active: "test"
+                Tomcat started on post: ...
+
+     + java -jar targer/tayjava-sample-code-0.0.1-SNAPSHOT.jar
+=============================================================================================================
+- YML:
+     + Mô hình phân theo cấp
+         A:
+          B:
+     + Thuộc tính ngăn cách với giá trị bằng dấu :
+
+
+  spring:
+    application:
+      name: SPRINGBOOT_BASE
+
+    datasource:
+      url: jdbc:mysql://localhost:3306/base_tayjava?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      username: root
+      password: "Ch@/12345678"
+      driver-class-name: com.mysql.cj.jdbc.Driver
+
+    jpa:
+      hibernate:
+        ddl-auto: update
+      database-platform: org.hibernate.dialect.MySQL8Dialect
+      show-sql: true
+      properties:
+        hibernate:
+          format_sql: true
+
+- PROPERTIES:
+     + A.B=
+     + Thuộc tính ngăn cách với giá trị bằng dấu =
+
+
+  spring.application.name=SPRINGBOOT_BASE
+
+  # MySQL config
+  spring.datasource.url=jdbc:mysql://localhost:3306/base_tayjava?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+
+  spring.datasource.username=root
+  spring.datasource.password=Ch@/12345678
+  spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+  # Hibernate config
+  spring.jpa.hibernate.ddl-auto=update
+  spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
+  spring.jpa.show-sql=true
+  spring.jpa.properties.hibernate.format_sql=true
+
+
+=============================================================================================================
+TỔNG KẾT CÁC BƯỚC BUILD THEO MÔI TRƯỜNG (KHÁC VỀ CÁCH VIẾT CÒN NGUYÊN TẮC THÌ VẪN THẾ THÔI)
+
+
+FIX LỖI :
+
+
+  profiles:
+      active: @spring.profiles.active@
+
+
+
+server:
+  port: 80
+spring:
+  application:
+    name: tay-java-app
+  profiles:
+    active: @spring.profiles.active@
+
