@@ -1,0 +1,167 @@
+- Cấu hình CORS:
+
+  + Ngăn chặn việc truy xuất chéo giữa các domain khi chưa có sự cho phép của chủ sở hữu.
+
+  + Đây là một cơ chế bảo mật của trình duyệt, cho phép (hoặc từ chối) các tài  nguyên (API)
+  của một trang web được truy cập bởi một trang web khác có domain khác.
+
+
+- Frontend React chạy tại: http://localhost:3000
+- Backend Spring Boot chạy tại: http://localhost:8080
+
+- Khi frontend gọi API từ backend, đây là cross-orgin request(yêu cầu bắt đầu băng qua), nên nếu không cấu hình CORS, trình duyệt sẽ chặn request lại mặc dù backend có trả dữ liệu.
+
+
+- Một ví dụ khác:
+frontend React chạy ở https://myfrontend.com.
+
+Backend API Spring Boot chạy ở https://api.mybackend.com
+Người dùng truy cập https://myfrontend.com, và website này cần gọi API từ https://api.mybackend.com.
+
+
+  @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowedOrigins(List.of("http://localhost:3000"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
+- Mục tiêu của đoạn cấu hình CORS trong Spring Boot để cho phép frontend React(localhost:3000) được gửi request đến
+backend Spring Boot, vốn đang chạy ở một cổng khác (Ví dụ như 8080).
+
+- Mặc định, nếu không cấu hình, trình duyệt sẽ chặn lại các request này.
+
+- Hiểu đơn giản thì việc cấu hình CORS sẽ cho phép frontend gọi API (GET,POST) tới backend để lấy dữ liệu.
+
+- Khi mình không cài đặt cấu hình CORS thì nó sẽ như này:
+
+Access to fetch at 'http://localhost:8080/user' from origin 'http://localhost:5174' has been blocked by CORS policy:
+No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs,
+set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
+
+
+======================================================================================================================
+        + Đường dẫn cụ thể vì để
+        config.setAllowedOrigins(List.of("http://localhost:3000"));
+
+        + Phương thức được phép
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+
+        +  Cho phép tất cả các HTTP headers được gửi từ client
+        config.setAllowedHeaders(List.of("*"));
+
+        + cho phép các request cross-origin có chứa thông tin đăng nhập (credentials).
+        config.setAllowCredentials(true);
+
+        + Tạo một nguồn cấu hình để ánh xạ cấu hình CORS cho các đường dẫn cụ thể (hoặc toàn bộ API).
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+- Câu lệnh config.setAllowCredentials(true); trong Spring (cụ thể là CorsConfiguration) cho phép trình duyệt gửi các
+request có chứa thông tin xác thực (credentials) như:
+
+  + Cookie
+  + Authorization header (Bearer token, Basic Auth,…)
+  + TLS client certificates (ít gặp hơn)
+
+====================================================================================================================
+
+- 3 cách cấu hình CORS:
+  + WebMvcConfigurer
+  + CorsFilter
+  + OncePerRequestFilter
+
+==========================
++ Cách thứ nhất:
+
+- Trước khi chuyển giao API cho đội frontend thì phải tích hợp CORS nếu không frontend sẽ bị lỗi cors.
+
+
+@Configuration
+public class AppConfig implements WebMvcConfigurer {
+
+  @Override
+  public void addCorsMappings(CorsRegistry registry) {
+    registry.addMapping("/**")
+        .allowedOrigins("http://localhost:5174/")
+        .allowCredentials(true)
+        .allowedHeaders("*")
+        .allowedMethods("*");
+  }
+}
+
+
++ Cách thứ hai:
+
+@Configuration
+public class AppConfig {
+
+  @Bean
+  public WebMvcConfigurer corsFilter(){
+     return new WebMvcConfigurer() {
+       @Override
+       public void addCorsMappings(CorsRegistry registry) {
+         registry.addMapping("/**")
+             .allowedOrigins("http://localhost:5174/")
+             .allowCredentials(true)
+             .allowedHeaders("*")
+             .allowedMethods("*");
+
+       }
+     };
+  }
+
+}
+====================================================================================================
+@Configuration
+public class AppConfig {
+
+  @Bean
+  public FilterRegistrationBean<CorsFilter> corsFilter() {
+     CorsConfiguration config = new CorsConfiguration();
+     config.setAllowCredentials(true);
+     config.addAllowedHeader("*");
+     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+     config.setAllowedOrigins(List.of("http://localhost:5174", "http://localhost:3000"));
+
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+     /*- Chỉ định các API của controleer nào + CHỈ ĐỊNH API ĐƯỢC PHÉP MỘT CÁCH CỤ THỂ HƠN -*/
+     source.registerCorsConfiguration("/**", config);
+
+     FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
+     bean.setOrder(0);
+     return bean;
+  }
+
+}
+
+==========================================================================================================
+
+- Cái requestFilter lọc trước tiên, nó phải qua cái này rồi mới đến API của mình.
+
+- Cái này dùng để lọc API, chỉ cho phép các API cụ thể đi vào.
+
+
+
+@Component
+public class AppConfig extends OncePerRequestFilter {
+
+  @Override
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+      FilterChain filterChain) throws ServletException, IOException {
+      response.setHeader("Access-Control-Allow-Origin", "http://localhost:5174/");
+      response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+      response.setHeader("Access-Control-Max-Age", "3600");
+      filterChain.doFilter(request, response);
+
+  }
+}
+

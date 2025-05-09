@@ -1,0 +1,30 @@
+- Không phải mọi header đều luôn được gửi lên từ frontend.
+
+- Chỉ một số header mặc định được trình duyệt hoặc thư viện HTTP (như fetch, axios) gửi đi,
+còn lại bạn phải thêm thủ công trong code nếu muốn gửi thêm.
+
+- Các loại header được gửi tự động ngay cả khi bạn không viết gì trong frontend:
+
+
+  Host: Tên miền đích (luôn có).
+  User-Agent: Trình duyệt, hệ điều hành của người dùng.
+  Accept: Loại nội dung mong muốn (text/html, application/json,...).
+  Accept-Language: Ngôn ngữ người dùng thiết lập trong trình duyệt.
+  Referer: URL nơi gửi đi yêu cầu (nếu có).
+  Connection, Sec-Fetch-*, Origin (tùy loại request và trình duyệt).
+
+
+Các header không tự động gửi, bạn phải thêm bằng tay:
+
+  Authorization (ví dụ Bearer token)
+  Content-Type (nếu không gửi dạng form thường)
+  X-Requested-With
+  Custom headers do bạn tự định nghĩa, ví dụ: X-App-Version, X-Custom-Token
+
+- Những header này cần được set thủ công trong code React/ Argular/... bằng fetch, axios, hoặc thư viện HTTP khác.
+
+=======================================================================================================================
+
+
+
+

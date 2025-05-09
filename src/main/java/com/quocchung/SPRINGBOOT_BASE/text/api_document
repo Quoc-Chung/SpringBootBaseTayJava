@@ -1,0 +1,184 @@
+- Tài liệu này chỉ làm duy nhất một lần.
+
+- API document (tài liệu API) là tài liệu mô tả chi tiết cách một API hoạt động, bao gồm :
+   + các endpoint
+   + phương thức (GET, POST, PUT, DELETE...)
+   + tham số đầu vào
+   + định dạng dữ liệu
+   + mã phản hồi (HTTP status codes)
+   + và ví dụ cụ thể.
+
+- Nó giúp lập trình viên hiểu cách sử dụng API một cách chính xác và hiệu quả.
+
+- Ý nghĩa của nó:
+
+✅ Tiết kiệm thời gian phát triển	Giúp frontend/backend hiểu đúng cách làm việc với nhau mà không cần trao đổi nhiều.
+✅ Giảm lỗi và nhầm lẫn	Có mô tả rõ ràng giúp tránh lỗi do truyền sai dữ liệu hoặc hiểu sai cấu trúc.
+✅ Hỗ trợ bảo trì và mở rộng hệ thống	Khi API thay đổi, chỉ cần cập nhật tài liệu là các bên liên quan có thể cập nhật theo.
+✅ Tích hợp dễ dàng với bên thứ ba	Nếu bạn cung cấp API cho đối tác, họ sẽ dựa vào tài liệu để tích hợp nhanh hơn.
+
+- Một API DOCUMENT thường gồm:
+
++  Mô tả tổng quan API.
++  Danh sách các endpoint (ví dụ: /api/users, /api/products/{id}).
++  Phương thức HTTP dùng cho mỗi endpoint.
++ Tham số truyền vào (path, query, body).
++ Dữ liệu trả về (response body).
++ Ví dụ cụ thể bằng JSON.
++ Mã lỗi trả về (400, 401, 404, 500...).
+
+Ví dụ (REST API tài liệu dạng Swagger/OpenAPI):
+
+GET /api/users
+Response:
+[
+  {
+    "id": 1,
+    "name": "Nguyen Van A",
+    "email": "a@gmail.com"
+  }
+]
+====================================================================================================
+
+@Tag(name="USER CONTROLLER ") : Định nghĩa lại tên API hiển thị của một controller trong SWAPGGER:
+
+@Operation: Thêm các mô tả cho một cái API:
+  @Operation(summary = "get user", description = "API lấy ra một user theo id")
+  @GetMapping("/{id}")
+  public ResponseEntity<?> getUser(@PathVariable Long id){
+    return  ResponseFactory.success(userService.getUser(id));
+  }
+
+- Ý nghĩa tổng quát của file OpenApiConfig.java:
+        + OpenApiConfig là một class cấu hình giúp SpringBoot tạo ra tài liệu OpenApi (Swagger UI) để
+hiển thị tài liệu API REST bạn đã viết , bao gồm:
+
+   + Tiêu đề API, phiên bản, mô tả, license...
+   + Server URL cho môi trường đang chạy
+   + Cấu hình bảo mật JWT (comment trong đoạn hiện tại)
+   + Chỉ định các package chứa controller cần được generate tài liệu API:
+
+
+
+@Bean
+public OpenAPI customOpenAPI(...)
+   + Định nghĩa một Bean kiểu OpenAPI (được thư viện springdoc-openapi sử dụng.
+   + Cung cấp thông tin metadata của API: title, version, description, license, server URL.
+
+   + Những giá trị này được tiêm từ application_*.yml qua @value
+
+
+    @Value("${open.api.title}") String title,
+    @Value("${open.api.version}") String version,
+    @Value("${open.api.description}") String description,
+    @Value("${open.api.serverUrl}") String serverUrl
+
+
+Info() → phần mô tả tổng quan API (hiển thị trên Swagger UI).
+License() → thông tin bản quyền.
+servers() → địa chỉ base URL của API.
+
+
+Khai báo một bean GroupedOpenApi, dùng để gom nhóm API theo package/controller,
+phục vụ hiển thị Swagger rõ ràng hơn.
+
+
+GroupedOpenApi.builder()
+  .group("api-service1")
+  .packagesToScan("com.quocchung.SPRINGBOOT_BASE.controller")
+  .build();
+
+group("api-service1"): tên nhóm trong Swagger.
+packagesToScan(...): chỉ định package chứa các @RestController cần tạo tài liệu API.
+
+Nếu bạn có nhiều controller theo module, bạn có thể tạo nhiều GroupedOpenApi để chia
+theo nhóm (giống chia tab trong Swagger UI).
+===================================================================================================
+
+- Mình sẽ giải thích chi tiết khái niệm GroupedOpenApi (chia nhóm API theo module/controller) bằng một ví dụ thực tế và dễ hiểu
+- Ban đầu khi mình chạy swapgger đéo có cái cấu hình nhóm gì, nó vẫn chạy ngon ơ, nhưng tất cả các
+API nó sẽ dồn chung hết vào .
+- Nghĩa là nó sẽ hiển thị ra tất cả các controller có bên trong của cái ứng dụng mà chúng ta đang truy cập, ứng với mỗi controller khi
+ta mở nó ra là tất cả các cái API mà cái controller nó chứa.
+- Nhưng giờ ta muốn chia khi mình chọn một server hay là một cái module, thì chỉ có một cái controller trong cái module đó hiển thị ra thôi
+thì phải tiến hành gom nhóm , điều này sẽ giúp API được chia thành các nhóm, ứng với mỗi nhóm khi mình chọn thì sẽ là các cái controller thực
+hiện cái API đó.
+
+
+
+- Giả sử bạn có một hệ thống lớn gồm nhiều module ( Khối chức năng):
+
+      + Module là một phần riêng biệt của hệ thống phần mềm có chức năng cụ thể. Nó giúp:
+      + Chia nhỏ chương trình lớn thành nhiều phần dễ quản lý.
+      + Mỗi module có thể hoạt động độc lập và có thể tái sử dụng.
+
+- Trong một web bán hàng, bạn có thể chia nhỏ thành các module khác nhau như sau:
+      + Auth(Xác thực) : Dăng nhập, đăng kí, cấp token
+      + User(Người dùng): Quản lí thông tin người dùng
+      + Product (Sản phẩm) : Thêm, sửa, xóa sản phẩm
+      + Order (Đơn hàng) : Đặt hàng, hủy đơn, xem lịch sử.
+
+- Module = Mô-đun = Nhóm chức năng riêng biệt của phần mềm (theo đúng nguyên tắc chia nhỏ để dễ quản lý, bảo trì, và mở rộng).
+
+
+controller/
+├── auth/
+│   └── LoginController.java
+├── user/
+│   └── UserController.java
+├── product/
+│   └── ProductController.java
+├── order/
+│   └── OrderController.java
+
+
+  com.quocchung.SPRINGBOOT_BASE.controller.auth.LoginController
+  com.quocchung.SPRINGBOOT_BASE.controller.user.UserController
+  com.quocchung.SPRINGBOOT_BASE.controller.product.ProductController
+  com.quocchung.SPRINGBOOT_BASE.controller.order.OrderController
+
+- Swagger sẽ hiển thị tất cả API dồn chung một chỗ, rất khó tìm và lộn xộn nếu API nhiều.
+
+@Bean
+public GroupedOpenApi authApi() {
+  return GroupedOpenApi.builder()
+      .group("Authentication") // tên tab hiển thị trên Swagger
+      .packagesToScan("com.quocchung.SPRINGBOOT_BASE.controller.auth")
+      .build();
+}
+
+@Bean
+public GroupedOpenApi userApi() {
+  return GroupedOpenApi.builder()
+      .group("User Management")
+      .packagesToScan("com.quocchung.SPRINGBOOT_BASE.controller.user")
+      .build();
+}
+
+@Bean
+public GroupedOpenApi productApi() {
+  return GroupedOpenApi.builder()
+      .group("Product")
+      .packagesToScan("com.quocchung.SPRINGBOOT_BASE.controller.product")
+      .build();
+}
+
+@Bean
+public GroupedOpenApi orderApi() {
+  return GroupedOpenApi.builder()
+      .group("Order")
+      .packagesToScan("com.quocchung.SPRINGBOOT_BASE.controller.order")
+      .build();
+}
+
+
+Sau khi cấu hình như trên, Swagger UI sẽ có các tab chọn nhóm API riêng biệt, ví dụ:
+
+🔵 Authentication
+
+🔵 User Management
+
+🔵 Product
+
+🔵 Order
+

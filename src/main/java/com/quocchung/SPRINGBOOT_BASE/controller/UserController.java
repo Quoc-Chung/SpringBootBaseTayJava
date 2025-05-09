@@ -6,6 +6,8 @@ import com.quocchung.SPRINGBOOT_BASE.dto.response.ResponseData;
 import com.quocchung.SPRINGBOOT_BASE.dto.response.ResponseFactory;
 import com.quocchung.SPRINGBOOT_BASE.dto.response.UserDetailResponse;
 import com.quocchung.SPRINGBOOT_BASE.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import java.util.List;
@@ -26,16 +28,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
+@Tag(name="USER CONTROLLER ")
 public class UserController
 {
 
   private final UserService userService;
 
+
+  @Operation(summary = "get user", description = "API lấy ra một user theo id")
   @GetMapping("/{id}")
   public ResponseEntity<?> getUser(@PathVariable Long id){
     return  ResponseFactory.success(userService.getUser(id));
   }
 
+  @Operation(summary = "get user", description = "Lấy ra toàn bộ user")
   @GetMapping()
   public ResponseEntity<GeneralResponse<List<UserDetailResponse>>> getUser(){
     return ResponseFactory.success(userService.getAllUsers());

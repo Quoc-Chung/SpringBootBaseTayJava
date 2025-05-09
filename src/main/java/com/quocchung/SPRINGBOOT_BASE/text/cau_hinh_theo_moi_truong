@@ -1,0 +1,16 @@
+- Một dự án chúng ta sẽ làm việc trên nhiều môi trường:
+      application-dev.yml	  Môi trường phát triển	Khi spring.profiles.active=dev
+      application-test.yml	Môi trường kiểm thử	Khi spring.profiles.active=test
+      application-prod.yml	Môi trường sản xuất	Khi spring.profiles.active=prod
+
+      application.properties -> Cấu hình mặc định, dùng chung cho mọi môi trường nếu không override
+      application.yml
+
+
+- Tách biệt môi trường để dễ quản lí và tránh lỗi, không dùng nhầm DB sản xuất khi đang test.
+
+- Bảo mật tốt hơn, vì môi trường prod có thể chứa thông tin nhạy cảm mà không nên dùng chung với môi
+trường dev.
+
+Bạn khai báo profile đang dùng trong application.properties:
+          spring.profiles.active=dev
